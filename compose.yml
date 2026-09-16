@@ -1,0 +1,56 @@
+services:
+  wordpress:
+    image: wordpress:${WP_VERSION:-7}
+    container_name: ${WP_INSTANCE_NAME:-koyzina-authentica-v2}
+    restart: unless-stopped
+    env_file: ./.env
+    environment:
+      WORDPRESS_DB_HOST: ${WP_DB_HOST}
+      WORDPRESS_DB_USER: ${WP_DB_USER}
+      WORDPRESS_DB_PASSWORD: ${WP_DB_PASSWORD}
+      WORDPRESS_DB_NAME: ${WP_DB_NAME}
+      WORDPRESS_CONFIG_EXTRA: |
+        define('WP_HOME', '${WP_DOMAIN}');
+        define('WP_SITEURL', '${WP_DOMAIN}');
+        define('WP_DEBUG', true);
+        define('WP_DEBUG_DISPLAY', false);
+        define('WP_DEBUG_LOG', '/var/www/html/wp-content/debug.log');
+        define('WP_ENVIRONMENT_TYPE', '${WP_ENVIRONMENT_TYPE:-production}' );
+        define('WP_MEMORY_LIMIT', '256M');
+        define( 'WP_MAX_MEMORY_LIMIT', '1024M' );
+    volumes:
+      - wp_core:/var/www/html
+      - ./wp-content:/var/www/html/wp-content
+      - ./docker/auth-passthrough.conf:/etc/apache2/conf-enabled/auth-passthrough.conf:ro
+      - ./docker/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini:ro
+    expose:
+      - 80
+    ports:
+      - 8883:80
+
+  wpcli:
+    image: wordpress:${WP_CLI_VERSION:-cli-php8.3}
+    profiles: ["tools"]
+    restart: "no"
+    env_file: ./.env
+    environment:
+      WORDPRESS_DB_HOST: ${WP_DB_HOST}
+      WORDPRESS_DB_USER: ${WP_DB_USER}
+      WORDPRESS_DB_PASSWORD: ${WP_DB_PASSWORD}
+      WORDPRESS_DB_NAME: ${WP_DB_NAME}
+    volumes:
+      - wp_core:/var/www/html
+      - ./wp-content:/var/www/html/wp-content
+    entrypoint: wp
+    command: ["core", "version"]
+    depends_on:
+      - wordpress
+
+volumes:
+  wp_core:
+
+networks:
+  default:
+    name: ${SHARED_NETWORK:-common_network}
+    external: true
+
