@@ -1,0 +1,19 @@
+.env
+.DS_Store
+**/.DS_Store
+
+# Docker-managed WP content (bind-mounted to ./wp-content).
+# Track themes/plugins; ignore runtime artifacts and user uploads.
+wp-content/uploads/
+wp-content/debug.log
+wp-content/upgrade/
+wp-content/upgrade-temp-backup/
+wp-content/themes/twentytwentyone/
+wp-content/themes/twentytwentytwo/
+wp-content/themes/twentytwentythree/
+wp-content/themes/twentytwentyfour/
+wp-content/themes/twentytwentyfive/
+wp-content/themes/twentysixteen/
+wp-content/themes/twentyseventeen/
+wp-content/plugins
+wp-content/languages
